@@ -15,6 +15,7 @@ int main()
 
     // Creating socket file descriptor
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        std::cout << "socket creation failed" << std::endl;
         perror("socket creation failed");
         exit(EXIT_FAILURE);
     }
@@ -29,6 +30,7 @@ int main()
 
     // Bind the socket with the server address
     if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+        std::cout << "bind failed" << std::endl;
         perror("bind failed");
         close(sockfd);
         exit(EXIT_FAILURE);
@@ -52,6 +54,7 @@ int main()
               sockfd, hello, strlen(
                   hello), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len) < 0)
         {
+            std::cout << "sendto error" << std::endl;
             perror("sendto error");
             close(sockfd);
             exit(EXIT_FAILURE);
