@@ -4,16 +4,14 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
-#define BUFFER_SIZE 1024
+#include "../include/client.hpp"
 
-int main()
+
+namespace udp
 {
-    int sockfd;
-    char buffer[BUFFER_SIZE];
-    const char * hello = "Hello from client";
-    struct sockaddr_in servaddr;
 
+void client::create_socket_desc()
+{
     // Creating socket file descriptor
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cout << "socket creation failed" << std::endl;
@@ -22,14 +20,17 @@ int main()
     }
 
     memset(&servaddr, 0, sizeof(servaddr));
+}
 
-    // Filling server information
+void client::server_config()
+{
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
     servaddr.sin_addr.s_addr = inet_addr("192.168.0.131"); // Use localhost for testing
+}
 
-    int n, len;
-
+void client::send_msg()
+{
     if (sendto(
           sockfd, hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
           sizeof(servaddr)) < 0)
@@ -40,7 +41,10 @@ int main()
         exit(EXIT_FAILURE);
     }
     std::cout << "Hello message sent." << std::endl;
+}
 
+void client::recieve()
+{
     n =
       recvfrom(
         sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&servaddr,
@@ -55,5 +59,20 @@ int main()
     std::cout << "Server: " << buffer << std::endl;
 
     close(sockfd);
+}
+
+} // namespace udp
+
+
+int main()
+{
+    udp::client client_hello;
+
+
+    client_hello.create_socket_desc();
+    client_hello.server_config();
+    client_hello.send_msg();
+    client_hello.recieve();
+
     return 0;
 }
