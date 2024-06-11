@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-#include <cstdio>
 #include <unistd.h>
 #include <arpa/inet.h>
 
@@ -36,21 +35,30 @@ int main()
     }
 
     while (true) {
-        socklen_t len;
-        int n;
-
-        len = sizeof(cliaddr);  // len is value/resuslt
-
-        n = recvfrom(
-            sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&cliaddr,
-            &len);
+        socklen_t len = sizeof(cliaddr);
+        int n = recvfrom(
+            sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL,
+            (struct sockaddr *)&cliaddr, &len);
+        if (n < 0) {
+            perror("recvfrom error");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
         buffer[n] = '\0';
-        std::cout << "Client : " << buffer << std::endl;
+        std::cout << "Client: " << buffer << std::endl;
 
         const char * hello = "Hello from server";
-        sendto(sockfd, hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
+        if (sendto(
+              sockfd, hello, strlen(
+                  hello), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len) < 0)
+        {
+            perror("sendto error");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
         std::cout << "Hello message sent." << std::endl;
     }
 
+    close(sockfd);
     return 0;
 }

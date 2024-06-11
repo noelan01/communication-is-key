@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-#include <cstdio>
 #include <unistd.h>
 #include <arpa/inet.h>
 
@@ -26,21 +25,31 @@ int main()
     // Filling server information
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
-    servaddr.sin_addr.s_addr = INADDR_ANY;
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Use localhost for testing
 
     int n, len;
 
-    sendto(
-        sockfd, hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
-        sizeof(servaddr));
+    if (sendto(
+          sockfd, hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
+          sizeof(servaddr)) < 0)
+    {
+        perror("sendto error");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
     std::cout << "Hello message sent." << std::endl;
 
     n =
       recvfrom(
         sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&servaddr,
         (socklen_t *)&len);
+    if (n < 0) {
+        perror("recvfrom error");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
     buffer[n] = '\0';
-    std::cout << "Server : " << buffer << std::endl;
+    std::cout << "Server: " << buffer << std::endl;
 
     close(sockfd);
     return 0;
