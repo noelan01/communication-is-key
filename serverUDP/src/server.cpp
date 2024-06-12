@@ -1,7 +1,4 @@
-#include <iostream>
 #include <cstring>
-#include <cstdlib>
-#include <unistd.h>
 #include <arpa/inet.h>
 
 #include "../include/server.hpp"
@@ -11,6 +8,7 @@ namespace udp
 {
 void server::init_server()
 {
+    std::cout << socket(AF_INET, SOCK_DGRAM, 0) << std::endl;
     // Creating socket file descriptor
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cout << "socket creation failed" << std::endl;
