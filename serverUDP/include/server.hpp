@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <unistd.h>
+#include <cstring>
 
 #define PORT 8080
 #define BUFFER_SIZE 1024

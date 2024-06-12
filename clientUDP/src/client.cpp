@@ -1,77 +1,57 @@
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <iostream>
-#include <cstring>
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
 
-#include "../include/client.hpp"
+#pragma comment(lib, "Ws2_32.lib")
 
+#define PORT 8080
+#define BUFFER_SIZE 1024
 
-namespace udp
-{
-
-void client::create_socket_desc()
-{
-    // Creating socket file descriptor
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        std::cout << "socket creation failed" << std::endl;
-        perror("socket creation failed");
-        exit(EXIT_FAILURE);
+int main() {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        std::cerr << "WSAStartup failed: " << result << std::endl;
+        return 1;
     }
 
-    memset(&servaddr, 0, sizeof(servaddr));
-}
+    SOCKET sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd == INVALID_SOCKET) {
+        std::cerr << "Socket creation failed: " << WSAGetLastError() << std::endl;
+        WSACleanup();
+        return 1;
+    }
 
-void client::server_config()
-{
+    sockaddr_in servaddr;
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
-    servaddr.sin_addr.s_addr = inet_addr(serverIP);  // server IP
-}
+    inet_pton(AF_INET, "192.168.0.104", &servaddr.sin_addr);
 
-void client::send_msg()
-{
-    if (sendto(
-          sockfd, hello, strlen(hello), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
-          sizeof(servaddr)) < 0)
-    {
-        std::cout << "sendto error" << std::endl;
-        perror("sendto error");
-        close(sockfd);
-        exit(EXIT_FAILURE);
+    const char *hello = "Hello from client";
+    int len = sizeof(servaddr);
+
+    int sendResult = sendto(sockfd, hello, strlen(hello), 0, (sockaddr *)&servaddr, len);
+    if (sendResult == SOCKET_ERROR) {
+        std::cerr << "sendto error: " << WSAGetLastError() << std::endl;
+        closesocket(sockfd);
+        WSACleanup();
+        return 1;
     }
     std::cout << "Hello message sent." << std::endl;
-}
 
-void client::recieve()
-{
-    n =
-      recvfrom(
-        sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&servaddr,
-        (socklen_t *)&len);
-    if (n < 0) {
-        std::cout << "recvfrom error" << std::endl;
-        perror("recvfrom error");
-        close(sockfd);
-        exit(EXIT_FAILURE);
+    char buffer[BUFFER_SIZE];
+    int n = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (sockaddr *)&servaddr, &len);
+    if (n == SOCKET_ERROR) {
+        std::cerr << "recvfrom error: " << WSAGetLastError() << std::endl;
+        closesocket(sockfd);
+        WSACleanup();
+        return 1;
     }
+
     buffer[n] = '\0';
     std::cout << "Server: " << buffer << std::endl;
 
-    close(sockfd);
-}
-
-} // namespace udp
-
-
-int main()
-{
-    udp::client client_hello;
-
-    client_hello.create_socket_desc();
-    client_hello.server_config();
-    client_hello.send_msg();
-    client_hello.recieve();
-
+    closesocket(sockfd);
+    WSACleanup();
     return 0;
 }
