@@ -1,10 +1,9 @@
 #pragma once
 
-#include <iostream>
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <cstring>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#pragma comment(lib, "Ws2_32.lib")
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
@@ -14,14 +13,20 @@ namespace udp
 class server
 {
 private:
-    /* data */
-    int sockfd;
+    /* private variables */
+    WSADATA wsaData;
+    SOCKET sockfd;
+    sockaddr_in servaddr;
+
     char buffer[BUFFER_SIZE];
-    struct sockaddr_in servaddr, cliaddr;
+    sockaddr_in cliaddr;
+    int len = sizeof(cliaddr);
+
 
 public:
-    void init_server();
-    void recieve_data();
+    /* public functions */
+    int init_server();
+    int recieve();
 };
 
 

@@ -1,34 +1,29 @@
 #pragma once
 
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#pragma comment(lib, "Ws2_32.lib")
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
 
 namespace udp
 {
-
+    
 class client
 {
 private:
-    /* variables */
-    const char * serverIP = "192.168.0.131";
-
-    int sockfd;
-    char buffer[BUFFER_SIZE];
-    const char * hello = "Hello from client";
-    struct sockaddr_in servaddr;
-
-    int n, len;
+    /* private variables */
+    WSADATA wsaData;
+    SOCKET sockfd;
+    sockaddr_in servaddr;
 
 public:
-    /* Functions */
-    void create_socket_desc();
-    void server_config();
-    void send_msg();
-    void recieve();
+    /* public functions */
+    int init_client();
+    int send_msg();
 
 };
+
 } // namespace udp
