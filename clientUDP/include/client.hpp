@@ -14,6 +14,8 @@ class client
 {
 private:
     /* variables */
+    const char * serverIP = "192.168.0.131";
+
     int sockfd;
     char buffer[BUFFER_SIZE];
     const char * hello = "Hello from client";

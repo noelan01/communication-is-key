@@ -26,7 +26,7 @@ void client::server_config()
 {
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
-    servaddr.sin_addr.s_addr = inet_addr("192.168.0.131"); // Use localhost for testing
+    servaddr.sin_addr.s_addr = inet_addr(serverIP);  // server IP
 }
 
 void client::send_msg()
@@ -67,7 +67,6 @@ void client::recieve()
 int main()
 {
     udp::client client_hello;
-
 
     client_hello.create_socket_desc();
     client_hello.server_config();
