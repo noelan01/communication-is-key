@@ -5,7 +5,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define PORT 8080
+#define PORT 3389
 #define BUFFER_SIZE 1024
 
 namespace udp
