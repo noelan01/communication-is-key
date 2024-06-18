@@ -4,6 +4,10 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sstream>
+#include <string>
+#include <bitset>
+#include <iomanip>
 #include <unistd.h>
 
 #define PORT 8080
@@ -20,8 +24,8 @@ private:
     char buffer[BUFSIZE];
     struct sockaddr_in servaddr, cliaddr;
 
-    simOut sim_out;
-    simIn sim_in;
+    //simOut sim_out;
+    //simIn sim_in;
 
 public:
     server(/* args */);
@@ -29,6 +33,7 @@ public:
 
     int init_port();
     int receive_msg();
+    double hex2double(const std::string &msg);
 };
 
 server::server(/* args */)

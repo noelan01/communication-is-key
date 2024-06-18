@@ -23,17 +23,34 @@ int client::init_port()
 
 int client::send_msg()
 {
-    memcpy(buffer, &msg, sizeof(double));
+    std::string msgStr = double2hex(msg);
 
-    sendto(
-        sockfd, buffer, sizeof(buffer), 0, (const struct sockaddr *)&servaddr,
-        sizeof(servaddr));
+    sendto(sockfd, msgStr.c_str(), msgStr.size(), 0, (const struct sockaddr *)&servaddr, sizeof(servaddr));
 
     std::cout << "Message sent to the server." << std::endl;
 
     close(sockfd);
     return 0;
 
+}
+
+std::string client::double2hex(double val)
+{
+    union {
+        double d;
+        uint8_t bytes[sizeof(double)];
+    } doubleUnion;
+
+    doubleUnion.d = val;
+
+    std::stringstream ss;
+    for (size_t i = 0; i < sizeof(double); ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(doubleUnion.bytes[i]);
+    }
+
+    std::string hexStringMsg = ss.str();
+
+    return hexStringMsg;
 }
 
 } // namespace bridge

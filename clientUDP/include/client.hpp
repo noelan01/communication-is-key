@@ -5,6 +5,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sstream>
+#include <bitset>
+#include <iomanip>
 
 #define PORT 8080
 #define BUFSIZE 1024
@@ -21,10 +24,11 @@ private:
     char buffer[BUFSIZE];
     struct sockaddr_in servaddr;
 
-    simOut sim_out;
-    simIn sim_in;
+    //simOut sim_out;
+    //simIn sim_in;
 
     double msg = 55.4345;
+
 
 public:
     client(/* args */);
@@ -32,6 +36,8 @@ public:
 
     int init_port();
     int send_msg();
+    std::string double2hex(double val);
+
 };
 
 client::client(/* args */)

@@ -39,22 +39,33 @@ int server::receive_msg()
         socklen_t len = sizeof(cliaddr);
         int n = recvfrom(sockfd, buffer, BUFSIZE, 0, (struct sockaddr *)&cliaddr, &len);
 
-        std::cout << n << std::endl;
-        /*
-        if (n != sizeof(double)) {
-            std::cerr << "Received data of incorrect size" << std::endl;
-            continue;
-        }
-        */
+        buffer[n] = '\0'; // Null-terminate the received data
+        std::cout << "Received: " << buffer << std::endl;
 
-        memcpy(&received_value, buffer, sizeof(double));
+        received_value = hex2double(buffer);
 
-        std::cout << "Received: " << received_value << std::endl;
+        std::cout << received_value << std::endl;
     }
 
     close(sockfd);
 
     return 0;
+}
+
+double server::hex2double(const std::string &msg)
+{
+    union {
+        double d;
+        uint8_t bytes[sizeof(double)];
+    } doubleUnion;
+
+    // Parse the hex string back into bytes
+    for (size_t i = 0; i < sizeof(double); ++i) {
+        std::string byteString = msg.substr(i * 2, 2);
+        doubleUnion.bytes[i] = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
+    }
+
+    return doubleUnion.d;
 }
 
 } // namespace bridge
