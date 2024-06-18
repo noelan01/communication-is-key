@@ -1,28 +1,31 @@
 #pragma once
 
 #include <iostream>
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <unistd.h>
+#include <boost/asio.hpp>
 
-#define PORT 8080
-#define BUFFER_SIZE 1024
+const int PORT = 8080;
 
-namespace udp
+
+namespace bridge
 {
+
 class server
 {
 private:
     /* data */
-    int sockfd;
-    char buffer[BUFFER_SIZE];
-    struct sockaddr_in servaddr, cliaddr;
 
 public:
-    void init_server();
-    void recieve_data();
+    server(/* args */);
+    ~server();
 };
 
+server::server(/* args */)
+{
+}
 
-} // namespace udp
+server::~server()
+{
+}
+
+
+} // namespace bridge

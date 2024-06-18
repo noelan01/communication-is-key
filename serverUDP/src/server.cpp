@@ -1,78 +1,41 @@
-#include <cstring>
-#include <arpa/inet.h>
-
 #include "../include/server.hpp"
 
-
-namespace udp
+namespace bridge
 {
-void server::init_server()
-{
-    // Creating socket file descriptor
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        std::cout << "socket creation failed" << std::endl;
-        perror("socket creation failed");
-        exit(EXIT_FAILURE);
-    }
 
-    memset(&servaddr, 0, sizeof(servaddr));
-    memset(&cliaddr, 0, sizeof(cliaddr));
-
-    // Filling server information
-    servaddr.sin_family = AF_INET; // IPv4
-    servaddr.sin_addr.s_addr = INADDR_ANY;
-    servaddr.sin_port = htons(PORT);
-
-    // Bind the socket with the server address
-    if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
-        std::cout << "bind failed" << std::endl;
-        perror("bind failed");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
-}
-
-void server::recieve_data()
-{
-    while (true) {
-        socklen_t len = sizeof(cliaddr);
-        int n = recvfrom(
-            sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL,
-            (struct sockaddr *)&cliaddr, &len);
-        if (n < 0) {
-            perror("recvfrom error");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
-        buffer[n] = '\0';
-        std::cout << "Client: " << buffer << std::endl;
-
-        const char * hello = "Hello from server";
-        if (sendto(
-              sockfd, hello, strlen(
-                  hello), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len) < 0)
-        {
-            std::cout << "sendto error" << std::endl;
-            perror("sendto error");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
-        std::cout << "Hello message sent." << std::endl;
-    }
-
-    close(sockfd);
-}
-
-
-} // namespace udp
+} // namespace bridge
 
 
 int main()
 {
-    udp::server server_1;
+    try {
+        boost::asio::io_context io_context;
 
-    server_1.init_server();
-    server_1.recieve_data();
+        boost::asio::ip::udp::socket socket(io_context,
+          boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), PORT));
+
+        std::cout << "Server is running on port " << PORT << std::endl;
+
+        while (true) {
+            char data[1024];
+            boost::asio::ip::udp::endpoint sender_endpoint;
+            boost::system::error_code error;
+
+            size_t length = socket.receive_from(
+                boost::asio::buffer(
+                    data,
+                    1024), sender_endpoint, 0,
+                error);
+
+            if (error && error != boost::asio::error::message_size) {
+                throw boost::system::system_error(error);
+            }
+
+            std::cout << "Received: " << std::string(data, length) << std::endl;
+        }
+    } catch (std::exception & e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
 
     return 0;
 }
