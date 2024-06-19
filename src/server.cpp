@@ -52,7 +52,7 @@ int server::receive_msg()
     return 0;
 }
 
-double server::hex2double(const std::string &msg)
+double server::hex2double(const std::string & msg)
 {
     union {
         double d;

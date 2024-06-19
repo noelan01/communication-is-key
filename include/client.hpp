@@ -8,6 +8,7 @@
 #include <sstream>
 #include <bitset>
 #include <iomanip>
+#include <vector>
 
 #define PORT 8080
 #define BUFSIZE 1024
@@ -15,6 +16,9 @@
 
 namespace bridge
 {
+
+class simIn;
+class simOut;
 
 class client
 {
@@ -24,19 +28,24 @@ private:
     char buffer[BUFSIZE];
     struct sockaddr_in servaddr;
 
-    //simOut sim_out;
-    //simIn sim_in;
 
-    double msg = 55.4345;
-
+    double msg = 123.456;
 
 public:
     client(/* args */);
     ~client();
 
     int init_port();
-    int send_msg();
+    int send_msgs();
+    int read_json();
     std::string double2hex(double val);
+
+    std::vector<std::vector<double>> sim_out;
+    std::vector<std::vector<double>> sim_in;
+
+
+    //simOut * sim_out;
+    //simIn * sim_in;
 
 };
 

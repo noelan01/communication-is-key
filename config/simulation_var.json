@@ -1,0 +1,43 @@
+{"simIn":
+{
+    "tThrReq": 0,
+    "tFl": 1,
+    "tFr": 2,
+    "tRl": 3,
+    "tRr": 4
+
+},
+"simOut": {
+    "apps": 0,
+    "bpps": 1,
+    "bps": 2,
+    "swa": 3,
+
+    "nFl": 4,
+    "nFr": 5,
+    "nRl": 6,
+    "nRr": 7,
+
+    "vx": 8,
+    "vy": 9,
+
+    "iResult": 10,
+    "pResult": 11,
+    "uResult": 12,
+    "soc": 13,
+
+    "fnState": 14,
+    "rnState": 15,
+    "swaFlag": 16,
+
+    "linAcc_x": 17,
+    "linAcc_y": 18,
+    "linAcc_z": 19,
+    "angVel_x": 20,
+    "angVel_y": 21,
+    "angVel_z": 22,
+
+    "launchCtrlReq": 23,         
+    "tvLvlUp": 24,
+    "lapNum": 25
+}}
