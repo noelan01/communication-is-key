@@ -33,7 +33,8 @@ public:
 
     int init_port();
     int receive_msg();
-    double hex2double(const std::string &msg);
+    double parse_msg(std::string msg);
+
 };
 
 server::server(/* args */)
@@ -46,50 +47,98 @@ server::~server()
 
 struct simIn
 {
-    float tThrReq;
+    struct val
+    {
+        double * tFl;
+        double * tFr;
+        double * tRl;
+        double * tRr;
+    };
 
-    double * tFl;
-    double * tFr;
-    double * tRl;
-    double * tRr;
-
+    enum id
+    {
+        tFl,
+        tFr,
+        tRl,
+        tRr
+    };
 };
 
 
 struct simOut
 {
-    double * apps;         // driver controls
-    double * bpps;
-    double * bps;
-    double * swa;
+    struct val
+    {
+        double * apps;         // driver controls
+        double * bpps;
+        double * bps;
+        double * swa;
 
-    double * nFl;         // wheelspeeds
-    double * nFr;
-    double * nRl;
-    double * nRr;
+        double * nFl;         // wheelspeeds
+        double * nFr;
+        double * nRl;
+        double * nRr;
 
-    double * vx;         // EKF
-    double * vy;
+        double * vx;         // EKF
+        double * vy;
 
-    double * iResult;         // Battery data
-    double * pResult;
-    double * uResult;
-    double * soc;
+        double * iResult;         // Battery data
+        double * pResult;
+        double * uResult;
+        double * soc;
 
-    double * fnState;         // states and flags
-    double * rnState;
-    double * swaFlag;
+        double * fnState;         // states and flags
+        double * rnState;
+        double * swaFlag;
 
-    double * linAcc_x;         // imu
-    double * linAcc_y;
-    double * linAcc_z;
-    double * angVel_x;
-    double * angVel_y;
-    double * angVel_z;
+        double * linAcc_x;         // imu
+        double * linAcc_y;
+        double * linAcc_z;
+        double * angVel_x;
+        double * angVel_y;
+        double * angVel_z;
 
-    double * launchCtrlReq;         // other
-    double * tvLvlUp;
-    double * lapNum;
+        double * launchCtrlReq;         // other
+        double * tvLvlUp;
+        double * lapNum;
+    };
+
+    enum id
+    {
+        apps,         // driver controls
+        bpps,
+        bps,
+        swa,
+
+        nFl,         // wheelspeeds
+        nFr,
+        nRl,
+        nRr,
+
+        vx,         // EKF
+        vy,
+
+        iResult,         // Battery data
+        pResult,
+        uResult,
+        soc,
+
+        fnState,         // states and flags
+        rnState,
+        swaFlag,
+
+        linAcc_x,         // imu
+        linAcc_y,
+        linAcc_z,
+        angVel_x,
+        angVel_y,
+        angVel_z,
+
+        launchCtrlReq,         // other
+        tvLvlUp,
+        lapNum
+    };
+
 };
 
 

@@ -42,7 +42,18 @@ int server::receive_msg()
         buffer[n] = '\0'; // Null-terminate the received data
         std::cout << "Received: " << buffer << std::endl;
 
-        received_value = hex2double(buffer);
+        std::string buffStr = buffer;
+
+
+
+        int id; // take out id before parsing
+
+        std::string idStr = buffStr.substr(0,2);
+        std::stringstream(idStr) >> id;
+
+
+        buffStr.erase(0,2);
+        received_value = parse_msg(buffStr);
 
         std::cout << received_value << std::endl;
     }
@@ -52,7 +63,7 @@ int server::receive_msg()
     return 0;
 }
 
-double server::hex2double(const std::string & msg)
+double server::parse_msg(std::string msg)
 {
     union {
         double d;
@@ -67,6 +78,7 @@ double server::hex2double(const std::string & msg)
 
     return doubleUnion.d;
 }
+
 
 } // namespace bridge
 

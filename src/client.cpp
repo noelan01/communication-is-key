@@ -27,9 +27,18 @@ int client::init_port()
 
 int client::send_msgs()
 {
-    int i = read_json();
+    //int i = read_json();
 
-    std::string msgStr = double2hex(msg);
+    int id = 0;
+    id = id + 10;
+
+    std::stringstream ss;
+    ss << id;
+    std::string idStr = ss.str();
+
+    std::string msgStr = parse_msg(msg);
+
+    msgStr = idStr + msgStr;
 
     sendto(
         sockfd, msgStr.c_str(), msgStr.size(), 0, (const struct sockaddr *)&servaddr,
@@ -47,6 +56,7 @@ int client::send_msgs()
  * Reads JSON file and assigns a sim_in and sim_out
  * vector with all id:s and initial values.
 **/
+/*
 int client::read_json()
 {
 
@@ -61,7 +71,6 @@ int client::read_json()
         }
     }
 
-    //std::cout << lastID << std::endl;
     lastID++;
     sim_out.resize(2, std::vector<double>(lastID));
 
@@ -87,8 +96,9 @@ int client::read_json()
 
     return 0;
 }
+*/
 
-std::string client::double2hex(double val)
+std::string client::parse_msg(double val)
 {
     union {
         double d;
