@@ -17,8 +17,59 @@
 namespace bridge
 {
 
-class simIn;
-class simOut;
+//class simIn;
+//class simOut;
+
+enum simOut_id
+{
+    APPS,             // driver controls
+    BPPS,
+    BPS,
+    SWA,
+
+    NFL,             // wheelspeeds
+    NFR,
+    NRL,
+    NRR,
+
+    VX,             // EKF
+    VY,
+
+    IRESULT,             // Battery data
+    PRESULT,
+    URESULT,
+    SOC,
+
+    FNSTATE,             // states and flags
+    RNSTATE,
+    SWAFLAG,
+
+    LINACC_X,             // imu
+    LINACC_Y,
+    LINACC_Z,
+    ANGVEL_X,
+    ANGVEL_Y,
+    ANGVEL_Z,
+
+    LAUNCHCTRREQ,             // other
+    TVLVLUP,
+    LAPNUM,
+
+    FIRST_EL_SIMOUT = APPS,
+    LAST_EL_SIMOUT = LAPNUM
+};
+
+enum simIn_id
+{
+    TFL,
+    TFR,
+    TRL,
+    TRR,
+
+    FIRST_EL_SIMIN = TFL,
+    LAST_EL_SIMIN = TRR
+};
+
 
 class client
 {
@@ -28,9 +79,6 @@ private:
     char buffer[BUFSIZE];
     struct sockaddr_in servaddr;
 
-
-    double msg = 123.456;
-
 public:
     client(/* args */);
     ~client();
@@ -38,15 +86,11 @@ public:
     int init_port();
     int send_msgs();
     int read_json();
-    std::string parse_msg(double val);
+    void init_vectors();
+    std::string parse_msg(int id, double val);
 
-    std::vector<std::vector<double>> sim_out;
-    std::vector<std::vector<double>> sim_in;
-
-
-    //simOut * sim_out;
-    //simIn * sim_in;
-
+    double sim_out[LAST_EL_SIMOUT];
+    double sim_in[LAST_EL_SIMIN];
 };
 
 client::client(/* args */)
@@ -65,14 +109,6 @@ struct simIn
         double * tFr;
         double * tRl;
         double * tRr;
-    };
-
-    enum id
-    {
-        tFl,
-        tFr,
-        tRl,
-        tRr
     };
 };
 
@@ -117,38 +153,38 @@ struct simOut
 
     enum id
     {
-        apps,         // driver controls
-        bpps,
-        bps,
-        swa,
+        APPS,         // driver controls
+        BPPS,
+        BPS,
+        SWA,
 
-        nFl,         // wheelspeeds
-        nFr,
-        nRl,
-        nRr,
+        NFL,         // wheelspeeds
+        NFR,
+        NRL,
+        NRR,
 
-        vx,         // EKF
-        vy,
+        VX,         // EKF
+        VY,
 
-        iResult,         // Battery data
-        pResult,
-        uResult,
-        soc,
+        IRESULT,         // Battery data
+        PRESULT,
+        URESULT,
+        SOC,
 
-        fnState,         // states and flags
-        rnState,
-        swaFlag,
+        FNSTATE,         // states and flags
+        RNSTATE,
+        SWAFLAG,
 
-        linAcc_x,         // imu
-        linAcc_y,
-        linAcc_z,
-        angVel_x,
-        angVel_y,
-        angVel_z,
+        LINACC_X,         // imu
+        LINACC_Y,
+        LINACC_Z,
+        ANGVEL_X,
+        ANGVEL_Y,
+        ANGVEL_Z,
 
-        launchCtrlReq,         // other
-        tvLvlUp,
-        lapNum
+        LAUNCHCTRREQ,         // other
+        TVLVLUP,
+        LAPNUM
     };
 
 };

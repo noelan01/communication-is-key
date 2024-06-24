@@ -29,77 +29,32 @@ int client::send_msgs()
 {
     //int i = read_json();
 
-    int id = 0;
-    id = id + 10;
+    init_vectors();
 
-    std::stringstream ss;
-    ss << id;
-    std::string idStr = ss.str();
+    for (int id = FIRST_EL_SIMOUT; id <= LAST_EL_SIMOUT; id++) {
 
-    std::string msgStr = parse_msg(msg);
+        std::string msgStr = parse_msg(id, sim_out[id]);
 
-    msgStr = idStr + msgStr;
+        std::cout << msgStr << std::endl;
 
-    sendto(
-        sockfd, msgStr.c_str(), msgStr.size(), 0, (const struct sockaddr *)&servaddr,
-        sizeof(servaddr));
-
-    std::cout << "Message sent to the server." << std::endl;
+        sendto(
+            sockfd, msgStr.c_str(), sizeof(msgStr), 0, (const struct sockaddr *)&servaddr,
+            sizeof(servaddr));
+    }
+    //std::cout << "Message sent to the server." << std::endl;
 
     close(sockfd);
     return 0;
-
 }
 
-/**
- * @brief
- * Reads JSON file and assigns a sim_in and sim_out
- * vector with all id:s and initial values.
-**/
-/*
-int client::read_json()
+
+std::string client::parse_msg(int id, double val)
 {
+    id = id + 10;
+    std::stringstream ssID;
+    ssID << id;
+    std::string idStr = ssID.str();
 
-    std::ifstream var_file("../config/simulation_var.json", std::ifstream::binary);
-    Json::Value var;
-    var_file >> var;
-
-    int lastID = 0;
-    for (auto it : var["simOut"]) {
-        if (lastID < it.asInt()) {
-            lastID = it.asInt();
-        }
-    }
-
-    lastID++;
-    sim_out.resize(2, std::vector<double>(lastID));
-
-    for (int i = 0; i <= (lastID); i++) {
-        sim_out[0][i] = i;
-        sim_out[1][i] = 0.0;
-    }
-
-    lastID = 0;
-    for (auto it : var["simIn"]) {
-        if (lastID < it.asInt()) {
-            lastID = it.asInt();
-        }
-    }
-
-    lastID++;
-    sim_in.resize(2, std::vector<double>(lastID));
-
-    for (int i = 0; i <= (lastID); i++) {
-        sim_in[0][i] = i;
-        sim_in[1][i] = 0.0;
-    }
-
-    return 0;
-}
-*/
-
-std::string client::parse_msg(double val)
-{
     union {
         double d;
         uint8_t bytes[sizeof(double)];
@@ -107,16 +62,29 @@ std::string client::parse_msg(double val)
 
     doubleUnion.d = val;
 
-    std::stringstream ss;
+    std::stringstream ssData;
     for (size_t i = 0; i < sizeof(double); ++i) {
-        ss << std::hex << std::setw(2) << std::setfill('0') <<
+        ssData << std::hex << std::setw(2) << std::setfill('0') <<
             static_cast<int>(doubleUnion.bytes[i]);
     }
 
-    std::string hexStringMsg = ss.str();
+    std::string StringMsg = idStr + ssData.str();
 
-    return hexStringMsg;
+    return StringMsg;
 }
+
+
+void client::init_vectors()
+{
+    for (int i = FIRST_EL_SIMIN; i <= LAST_EL_SIMIN; i++) {
+        sim_in[i] = 0.0;
+    }
+
+    for (int i = FIRST_EL_SIMOUT; i <= LAST_EL_SIMOUT; i++) {
+        sim_out[i] = 0.0;
+    }
+}
+
 
 } // namespace bridge
 

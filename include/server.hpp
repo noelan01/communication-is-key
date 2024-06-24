@@ -33,6 +33,7 @@ public:
 
     int init_port();
     int receive_msg();
+    int init_vector();
     double parse_msg(std::string msg);
 
 };

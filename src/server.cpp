@@ -45,16 +45,17 @@ int server::receive_msg()
         std::string buffStr = buffer;
 
 
-
         int id; // take out id before parsing
 
-        std::string idStr = buffStr.substr(0,2);
+        std::string idStr = buffStr.substr(0, 2);
         std::stringstream(idStr) >> id;
 
+        id = id - 10;
 
-        buffStr.erase(0,2);
+        buffStr.erase(0, 2);
         received_value = parse_msg(buffStr);
 
+        std::cout << id << std::endl;
         std::cout << received_value << std::endl;
     }
 
