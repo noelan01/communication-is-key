@@ -1,5 +1,6 @@
 #include <cstring>
 #include <arpa/inet.h>
+#include <sstream>
 
 #include "../include/server.hpp"
 
@@ -8,7 +9,7 @@ namespace udp
 {
 void server::init_server()
 {
-    std::cout << socket(AF_INET, SOCK_DGRAM, 0) << std::endl;
+    //std::cout << socket(AF_INET, SOCK_DGRAM, 0) << std::endl;
     // Creating socket file descriptor
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cout << "socket creation failed" << std::endl;
@@ -48,6 +49,13 @@ void server::recieve_data()
         buffer[n] = '\0';
         std::cout << "Client: " << buffer << std::endl;
 
+        std::string msgStr = buffer;
+
+        parse_msg(msgStr);
+
+        std::cout << recv_id << std::endl;
+        std::cout << recv_data << std::endl;
+        /*
         const char * hello = "Hello from server";
         if (sendto(
               sockfd, hello, strlen(
@@ -59,9 +67,34 @@ void server::recieve_data()
             exit(EXIT_FAILURE);
         }
         std::cout << "Hello message sent." << std::endl;
+        */
     }
 
     close(sockfd);
+}
+
+void server::parse_msg(std::string msg)
+{
+    std::string idStr = msg.substr(0,2);
+    msg.erase(0,2);
+
+    std::stringstream ss;
+    ss << idStr;
+    ss >> recv_id;
+    recv_id = recv_id - 10;
+
+    union {
+        double d;
+        uint8_t bytes[sizeof(double)];
+    } doubleUnion;
+
+    // Parse the hex string back into bytes
+    for (size_t i = 0; i < sizeof(double); ++i) {
+        std::string byteString = msg.substr(i * 2, 2);
+        doubleUnion.bytes[i] = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
+    }
+
+    recv_data = doubleUnion.d;
 }
 
 
