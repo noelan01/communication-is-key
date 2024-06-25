@@ -19,9 +19,13 @@ private:
     char buffer[BUFFER_SIZE];
     struct sockaddr_in servaddr, cliaddr;
 
+    int recv_id;
+    double recv_data;
+
 public:
     void init_server();
     void recieve_data();
+    void parse_msg(std::string msg);
 };
 
 
