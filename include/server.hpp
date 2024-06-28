@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define PORT 8080
+#define PORT 8081
 #define BUFFER_SIZE 1024
 
 namespace udp

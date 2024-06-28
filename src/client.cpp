@@ -79,7 +79,7 @@ void client::init_vectors()
     }
 
     for (int i = FIRST_EL_SIMOUT; i <= LAST_EL_SIMOUT; i++) {
-        sim_out[i] = 0.0;
+        sim_out[i] = 1.0;
     }
 }
 

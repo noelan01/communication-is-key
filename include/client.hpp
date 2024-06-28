@@ -4,12 +4,13 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
+#define PORT 8081
 #define BUFFER_SIZE 1024
 
 namespace udp
 {
-    enum simIn_id
+    
+enum simIn_id
 {
     TFL,
     TFR,
