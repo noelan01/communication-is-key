@@ -8,6 +8,8 @@
 
 #include "../include/client.hpp"
 
+#define SIMIN_PORT 49158
+#define SIMOUT_PORT 49153
 
 namespace udp
 {
@@ -24,35 +26,130 @@ void client::init()
     memset(&servaddr, 0, sizeof(servaddr));
 
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(PORT);
+    servaddr.sin_port = htons(SIMOUT_PORT);
     servaddr.sin_addr.s_addr = inet_addr(serverIP);  // server IP (localhost)
 }
 
 
 void client::send_msg()
 {
-    init_vectors();
+    //init_vectors();
 
-    for (int id = 0; id <= LAST_EL_SIMOUT; id++)
+    Message message;
+    message.type = VECTOR_INT;
+    message.functionCall = 1; // Example function call identifier
+    message.intVector = {1, 2, 3, 4, 5};
+    message.length = message.intVector.size();
+
+    serialize_message(message, buffer, bufferSize);
+    sendUDP(buffer, bufferSize, serverIP, SIMOUT_PORT);
+
+    message.type = DOUBLE;
+    message.functionCall = 1; // Example function call identifier
+    message.data.doubleValue = 8.8888;
+    message.length = 0;
+
+    serialize_message(message, buffer, bufferSize);
+    sendUDP(buffer, bufferSize, serverIP, SIMOUT_PORT);
+
+
+    /*if (sendto(
+          sockfd, &msg, strlen(msg), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
+          sizeof(servaddr)) < 0)
     {
-        parse_msg(id, sim_out[id]);
+        std::cout << "sendto error" << std::endl;
+        perror("sendto error");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }*/
 
-        strcpy(&msg[0], StringMsg.data());        
-
-        if (sendto(
-            sockfd, &msg, strlen(msg), MSG_CONFIRM, (const struct sockaddr *)&servaddr,
-            sizeof(servaddr)) < 0)
-        {
-            std::cout << "sendto error" << std::endl;
-            perror("sendto error");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
-
-    }
 
     close(sockfd);
 }
+
+
+void client::sendUDP(const char * buffer, size_t length, const char * ip, int port)
+{
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in servaddr;
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_port = htons(port);
+    inet_pton(AF_INET, ip, &servaddr.sin_addr);
+
+    sendto(sockfd, buffer, length, 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+    close(sockfd);
+}
+
+/*
+void client::init_vectors()
+{
+    for (int i = FIRST_EL_SIMIN; i <= LAST_EL_SIMIN; i++) {
+        sim_in[i] = 5.0;
+    }
+
+    for (int i = FIRST_EL_SIMOUT; i <= LAST_EL_SIMOUT; i++) {
+        sim_out[i] = 10.55;
+    }
+}
+*/
+int hton_int(int value)
+{
+    return htonl(value);
+}
+
+int ntoh_int(int value)
+{
+    return ntohl(value);
+}
+
+void client::serialize_message(const Message & message, char * buffer, size_t & bufferSize)
+{
+    size_t offset = 0;
+
+    std::memcpy(buffer + offset, &message.type, sizeof(message.type));
+    offset += sizeof(message.type);
+
+    std::memcpy(buffer + offset, &message.functionCall, sizeof(message.functionCall));
+    offset += sizeof(message.functionCall);
+
+    std::memcpy(buffer + offset, &message.length, sizeof(message.length));
+    offset += sizeof(message.length);
+
+    switch (message.type) {
+      case UNSIGNED_INT:
+        {
+            unsigned int networkInt = htonl(message.data.uintValue);
+            std::memcpy(buffer + offset, &networkInt, sizeof(networkInt));
+            offset += sizeof(networkInt);
+        }
+        break;
+      case DOUBLE:
+          std::memcpy(buffer + offset, &message.data.doubleValue, sizeof(message.data.doubleValue));
+          offset += sizeof(message.data.doubleValue);
+          break;
+      case BOOL:
+          std::memcpy(buffer + offset, &message.data.boolValue, sizeof(message.data.boolValue));
+          offset += sizeof(message.data.boolValue);
+          break;
+      case VECTOR_INT:
+          for (size_t i = 0; i < message.length; ++i) {
+              int networkInt = htonl(message.intVector[i]);
+              std::memcpy(buffer + offset, &networkInt, sizeof(networkInt));
+              offset += sizeof(networkInt);
+          }
+          break;
+      case DEQUE_INT:
+          for (size_t i = 0; i < message.length; ++i) {
+              int networkInt = htonl(message.intDeque[i]);
+              std::memcpy(buffer + offset, &networkInt, sizeof(networkInt));
+              offset += sizeof(networkInt);
+          }
+          break;
+    }
+
+    bufferSize = offset;
+}
+
 
 void client::recieve()
 {
@@ -72,17 +169,7 @@ void client::recieve()
     close(sockfd);
 }
 
-void client::init_vectors()
-{
-    for (int i = FIRST_EL_SIMIN; i <= LAST_EL_SIMIN; i++) {
-        sim_in[i] = 0.0;
-    }
-
-    for (int i = FIRST_EL_SIMOUT; i <= LAST_EL_SIMOUT; i++) {
-        sim_out[i] = 1.0;
-    }
-}
-
+/*
 void client::parse_msg(int id, double data)
 {
     id = id + 10;
@@ -105,6 +192,7 @@ void client::parse_msg(int id, double data)
 
     StringMsg = idStr + ssData.str();
 }
+*/
 
 } // namespace udp
 
